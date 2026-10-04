@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Samiksha Sinha — Product Designer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anek+Latin:wght@200;300;400;500;600;700&family=Anek+Devanagari:wght@200;300;400;600&family=Anek+Kannada:wght@200;300;400;600&family=Anek+Tamil:wght@200;300;400;600&family=Anek+Bangla:wght@200;300;400;600&family=Instrument+Sans:wght@400;500;600&family=Doto:wght@500;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* =====================================================================
+   V3
+   GOLDEN-RATIO GRID   89 : 55 : 34 : 21 : 13 : 8   (sum 220)
+     col 1–5  → content
+     col 6    → RESERVED RAIL (fixed). Kept free for future links /
+                slider / CTA. Holds only two utility buttons at top.
+   NAVBAR HEIGHT = width of col 6 (measured live), so the top-right
+   cell of the grid is a perfect square.
+   ===================================================================== */
+:root{
+  --cols: 89fr 55fr 34fr 21fr 13fr 8fr;
+  --rail: calc(100vw * 8 / 220);     /* overwritten by JS with the exact measured width */
+  --head: var(--rail);
+  --qlh: var(--head);                /* quick-links bar height = navbar height */
+
+  /* anchors (fixed) */
+  --black:#000; --white:#fff;
+  --night:#04050b; --deep:#0a1033;
+  --muted-d:rgba(255,255,255,.62); --hair-d:rgba(255,255,255,.16);
+
+  /* semantic (switch in dark mode) */
+  --bg:#ffffff; --fg:#000000; --fog:#f3f4f7; --muted:#5d6272;
+  --hair:rgba(0,0,0,.10); --ph:#dfe1e7; --ph-stripe:rgba(0,0,0,.04); --ph-text:rgba(0,0,0,.5);
+  --btn:#ffffff; --btn-fg:#000;
+
+  /* spectrum */
+  --s-blue:#2440ff; --s-mid:#8a5cf0; --s-warm:#e8609a; --s-orange:#ff7a2e;
+  --spectrum: linear-gradient(90deg,var(--s-blue) 0%,#5a55ff 28%,var(--s-mid) 48%,var(--s-warm) 70%,var(--s-orange) 100%);
+  --glow-blue: rgba(36,64,255,.55); --glow-orange: rgba(255,122,46,.42);
+
+  --line: rgba(140,146,175,.22);
+  --pad: clamp(20px, 5vw, 72px);
+
+  /* type */
+  --display:'Anek Latin','Anek Devanagari','Anek Kannada','Anek Tamil','Anek Bangla',system-ui,sans-serif;
+  --body:'Instrument Sans','Anek Devanagari',system-ui,sans-serif;
+  --dot:'Doto',ui-monospace,monospace;      /* dot-matrix micro type */
+  --ease:cubic-bezier(.7,0,.2,1);
+}
+body.dark{
+  --bg:#04050b; --fg:#ffffff; --fog:#0a1033; --muted:rgba(255,255,255,.6);
+  --hair:rgba(255,255,255,.13); --ph:#11152c; --ph-stripe:rgba(255,255,255,.03); --ph-text:rgba(255,255,255,.4);
+  --btn:#11152c; --btn-fg:#fff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--body);color:var(--fg);background:var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden;transition:background-color .6s var(--ease),color .6s var(--ease)}
+::selection{background:var(--s-blue);color:var(--white)}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.grad{background:var(--spectrum);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* dot-matrix micro type (labels, meta, numbers) */
+.eyebrow,.dt{font-family:var(--dot);font-weight:800;text-transform:uppercase;letter-spacing:.1em}
+.eyebrow{font-size:14px;line-height:1}
+
+/* ---------- grid primitives ---------- */
+.grid{display:grid;grid-template-columns:var(--cols);position:relative}
+.cell{min-width:0;padding-right:20px}
+.first{padding-left:var(--pad)}
+
+.grid-lines{position:fixed;inset:0;display:grid;grid-template-columns:var(--cols);pointer-events:none;z-index:150}
+.grid-lines span{border-left:1px solid var(--line);transform-origin:top;animation:draw 1.6s var(--ease) both;transition:border-color .5s,background-color .5s}
+.grid-lines span:first-child{border-left:0}
+.grid-lines span:nth-child(3){animation-delay:.08s}.grid-lines span:nth-child(4){animation-delay:.16s}
+.grid-lines span:nth-child(5){animation-delay:.24s}.grid-lines span:nth-child(6){animation-delay:.32s}
+@keyframes draw{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+body.show-grid{--line:rgba(255,122,46,.85)}
+body.show-grid .grid-lines span{background:rgba(36,64,255,.04)}
+
+.glow{position:absolute;inset:-10%;pointer-events:none;mix-blend-mode:screen;
+  background:radial-gradient(38% 46% at 72% 18%,var(--glow-blue),transparent 70%),radial-gradient(32% 40% at 88% 78%,var(--glow-orange),transparent 70%);
+  animation:drift 18s ease-in-out infinite alternate}
+@keyframes drift{to{transform:translate(-6%,5%) scale(1.1)}}
+
+/* ---------- placeholders ---------- */
+.ph{position:relative;overflow:hidden;background:var(--ph) repeating-linear-gradient(135deg,transparent 0 14px,var(--ph-stripe) 14px 15px);transition:background-color .6s}
+.ph::after{content:attr(data-label);position:absolute;left:16px;top:16px;max-width:80%;font:500 11px/1.5 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--ph-text)}
+.ph-dark{background-color:#0d1022;background-image:repeating-linear-gradient(135deg,transparent 0 14px,rgba(255,255,255,.03) 14px 15px)}
+.ph-dark::after{color:rgba(255,255,255,.42)}
+.ph img,.ph video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ph:has(img)::after,.ph:has(video)::after{display:none}
+
+/* ================= RAIL (column 6) ================= */
+.rail{position:fixed;top:0;right:0;bottom:0;width:var(--rail);z-index:130;display:flex;flex-direction:column;pointer-events:none}
+.rail-slot{flex:1}   /* ← RESERVED: future links / slider / CTA live here */
+.rbtn{pointer-events:auto;position:relative;width:var(--rail);height:var(--rail);display:grid;place-items:center;color:var(--white);
+  background:rgba(0,0,0,.42);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--hair-d);transition:background .4s}
+.rbtn:hover{background:rgba(0,0,0,.7)}
+.rbtn svg{width:46%;height:46%;overflow:visible}
+.rbtn:focus-visible{outline:2px solid var(--s-orange);outline-offset:-2px}
+/* tooltip slides out to the left */
+.rbtn .tip{position:absolute;right:100%;top:50%;transform:translate(8px,-50%);opacity:0;white-space:nowrap;padding:7px 10px;background:var(--black);color:var(--white);font:800 11px var(--dot);letter-spacing:.12em;text-transform:uppercase;transition:opacity .3s,transform .4s var(--ease);pointer-events:none}
+.rbtn:hover .tip,.rbtn:focus-visible .tip{opacity:1;transform:translate(0,-50%)}
+/* state pip */
+.rbtn::after{content:"";position:absolute;right:6px;top:6px;width:4px;height:4px;border-radius:50%;background:var(--spectrum);transform:scale(0);transition:transform .4s var(--ease)}
+.rbtn[aria-pressed="true"]::after{transform:scale(1)}
+
+/* grid icon: frame + golden column lines that re-draw */
+.gi rect{fill:none;stroke:currentColor;stroke-width:1.4}
+.gi line{stroke:currentColor;stroke-width:1.4;stroke-dasharray:20;stroke-dashoffset:0;transition:stroke .4s}
+.rbtn:hover .gi line{animation:redraw .7s var(--ease) both}
+.gi line:nth-of-type(2){animation-delay:.07s!important}.gi line:nth-of-type(3){animation-delay:.14s!important}.gi line:nth-of-type(4){animation-delay:.21s!important}
+@keyframes redraw{from{stroke-dashoffset:20}to{stroke-dashoffset:0}}
+#gridBtn[aria-pressed="true"] .gi line{stroke:url(#spec)}
+
+/* dark icon: disc ↔ crescent morph, rays retract */
+.mi .mc{transition:transform .7s var(--ease)}
+.mi .rays{transform-origin:12px 12px;transition:transform .7s var(--ease),opacity .4s}
+.mi .disc{transition:transform .7s var(--ease);transform-origin:12px 12px}
+body.dark .mi .mc{transform:translateX(-13px)}
+body.dark .mi .rays{opacity:0;transform:rotate(90deg) scale(.5)}
+body.dark .mi .disc{transform:scale(1.25) rotate(-20deg)}
+
+/* ================= HEADER (wordmark + menu only) ================= */
+.site-head{position:fixed;top:0;left:0;right:0;z-index:120;height:var(--head);color:var(--white);pointer-events:none;transition:background .4s}
+.site-head .cell{grid-column:1;display:flex;align-items:center;justify-content:space-between;height:100%;pointer-events:auto}
+/* wordmark — Sarvam-style: lowercase, tight, strictly monochrome */
+.brand{font:600 clamp(16px,1.45vw,22px)/1 var(--display);letter-spacing:-.035em;text-transform:lowercase}
+.menu-btn{display:flex;align-items:center;gap:12px;font:500 clamp(13px,1.05vw,16px)/1 var(--body)}
+.burger{width:36px;height:10px;position:relative}
+.burger::before,.burger::after{content:"";position:absolute;right:0;height:1.5px;background:currentColor;transition:width .4s var(--ease)}
+.burger::before{top:0;width:36px}.burger::after{bottom:0;width:24px}
+.menu-btn:hover .burger::after{width:36px}
+
+/* ================= MENU OVERLAY ================= */
+.menu{position:fixed;inset:0;z-index:200;background:var(--night);color:var(--white);transform:translateY(-100%);transition:transform .7s var(--ease);align-content:center;overflow:hidden}
+.menu.open{transform:none}
+.menu ul{list-style:none;grid-column:2/6;position:relative}
+.menu li a{display:block;font:200 clamp(40px,6vw,88px)/1.15 var(--display);letter-spacing:-.02em;padding:6px 0;border-top:1px solid var(--hair-d)}
+.menu li a:hover{background:var(--spectrum);-webkit-background-clip:text;background-clip:text;color:transparent}
+.menu .close{position:absolute;top:0;height:var(--head);right:calc(var(--rail) + 24px);font:500 16px var(--body);z-index:2}
+.menu .m-meta{grid-column:1;align-self:end;padding-left:var(--pad);font:700 14px/1.8 var(--dot);text-transform:uppercase;letter-spacing:.08em;color:var(--muted-d);position:relative}
+
+/* ================= HERO ================= */
+.hero{position:relative;min-height:100vh;color:var(--white);display:flex;align-items:flex-end;overflow:hidden;background:var(--night);
+  padding-bottom:calc(var(--qlh) + 120px)}
+.hero-bg{position:absolute;inset:0}
+.hero-bg::after{left:auto;right:calc(var(--rail) + 24px);text-align:right;top:calc(var(--head) + 16px)}
+.hero-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,5,11,.25),rgba(4,5,11,.85))}
+.hero-inner{width:100%;row-gap:26px;padding-top:calc(var(--head) + 60px)}
+.hero .eyebrow{grid-column:1/5;color:var(--muted-d);display:flex;align-items:center;gap:12px}
+.hero .eyebrow::before{content:"";width:22px;height:2px;background:var(--spectrum)}
+.hero h1{grid-column:1/5;font:200 clamp(60px,9vw,158px)/1.12 var(--display);letter-spacing:-.035em}
+.hero h1 .l2{display:block;font-weight:500}
+/* multiscript greeting — whole words cross-fade, letterforms never split */
+.greet{display:inline-grid;justify-items:start}
+.greet b{grid-area:1/1;font-weight:200;opacity:0;animation:greet 15s infinite;white-space:nowrap}
+.greet b:nth-child(2){animation-delay:3s}.greet b:nth-child(3){animation-delay:6s}
+.greet b:nth-child(4){animation-delay:9s}.greet b:nth-child(5){animation-delay:12s}
+@keyframes greet{0%{opacity:0;filter:blur(8px)}4%,17%{opacity:1;filter:none}21%,100%{opacity:0;filter:blur(8px)}}
+.hero .lede{grid-column:2/5;font:300 clamp(19px,1.9vw,29px)/1.3 var(--display);color:var(--muted-d)}
+.hero .lede strong{font-weight:500;color:var(--white)}
+
+/* ================= QUICK LINKS = NAVBAR =================
+   One element. Sits at hero bottom → scrolls up → sticks at top:0 →
+   icons fade, black bar fades in, joins wordmark + Menu. */
+.ql{position:sticky;top:0;z-index:110;height:var(--qlh);margin-top:calc(-1 * var(--qlh));color:var(--white)}
+.ql::before{content:"";position:absolute;inset:0;background:var(--black);opacity:0;transition:opacity .45s var(--ease)}
+.ql::after{content:"";position:absolute;left:0;bottom:0;height:2px;width:calc(var(--p,0) * 100%);background:var(--spectrum);opacity:0;transition:opacity .45s}
+.ql.docked::before,.ql.docked::after{opacity:1}
+.ql-label{position:absolute;left:40.4545%;bottom:calc(100% + 92px);color:var(--muted-d);font-size:13px;transition:opacity .35s}
+.ql a{position:relative;display:flex;align-items:center;justify-content:space-between;height:100%;padding-right:20px;border-top:1px solid rgba(255,255,255,.45);transition:border-color .45s}
+.ql a:nth-of-type(1){grid-column:2}.ql a:nth-of-type(2){grid-column:3}.ql a:nth-of-type(3){grid-column:4}.ql a:nth-of-type(4){grid-column:5}
+.ql.docked a{border-color:transparent}
+.ql .ic{position:absolute;left:0;bottom:calc(100% + 26px);width:34px;height:34px;stroke:var(--white);fill:none;stroke-width:1.2;transition:opacity .35s,transform .5s var(--ease)}
+.ql.docked .ic,.ql.docked .ql-label{opacity:0;transform:translateY(12px);pointer-events:none}
+.ql b{font:500 clamp(14px,1.3vw,19px)/1 var(--display);position:relative;padding:6px 0;white-space:nowrap}
+.ql b::after,.dash::after{content:"";position:absolute;left:0;bottom:0;width:22px;height:2px;background:var(--spectrum);background-size:600% 100%;transition:width .5s var(--ease),background-size .5s var(--ease)}
+.ql a:hover b::after,.ql a.on b::after,.card:hover h3::after{width:100%;background-size:100% 100%}
+.ql i{font:800 11px var(--dot);font-style:normal;letter-spacing:.1em;color:var(--muted-d)}
+
+/* ================= FEATURED ================= */
+.featured{min-height:88vh;grid-template-rows:auto 1fr}
+.f-title{grid-column:1/3;grid-row:1;padding-top:calc(var(--head) + 28px);padding-bottom:40px;position:relative;z-index:2}
+.f-title .eyebrow{color:var(--muted);margin-bottom:22px;display:flex;align-items:center;gap:10px}
+.f-title .eyebrow::before{content:"";width:22px;height:2px;background:var(--spectrum)}
+.f-title h2{font:300 clamp(44px,6.2vw,104px)/1.02 var(--display);letter-spacing:-.03em}
+.f-desc{grid-column:1/2;grid-row:2;border-top:1px solid var(--hair);padding-top:36px;font:400 clamp(18px,1.7vw,26px)/1.4 var(--body);color:var(--muted)}
+.f-meta{grid-column:2/3;grid-row:2;display:flex;flex-direction:column;justify-content:space-between;padding:36px 20px 60px 0}
+.f-meta dl{font:700 16px/1.45 var(--dot);text-transform:uppercase;letter-spacing:.06em;color:var(--fg)}
+.f-meta dt{font-size:12px;font-weight:800;letter-spacing:.14em;color:var(--muted);margin-top:16px}
+.f-meta dt::before{content:"";display:inline-block;width:5px;height:5px;margin:0 8px 1px 0;background:var(--spectrum);border-radius:50%}
+.cta{display:flex;justify-content:space-between;padding-top:14px;font:500 18px var(--display);width:80%;position:relative}
+.cta::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:var(--spectrum)}
+.cta span{transition:transform .3s var(--ease)}
+.cta:hover span{transform:translate(4px,-4px)}
+.f-img{grid-column:3/6;grid-row:1/3}
+
+/* ================= SELECTED WORK ================= */
+.work{padding-top:40px;position:relative}
+.work::before{content:"";position:absolute;left:0;right:0;bottom:0;top:62%;background:var(--fog);z-index:-1;transition:background .6s}
+.work h2{grid-column:1/2;font:400 clamp(34px,4vw,64px)/1.02 var(--display);letter-spacing:-.03em;padding-top:20px;padding-left:calc(var(--pad) + 6vw)}
+.track{grid-column:2/6;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+.track::-webkit-scrollbar{display:none}
+.card{flex:0 0 25vw;min-width:240px;aspect-ratio:4/5;scroll-snap-align:start;border-right:1px solid var(--bg);color:var(--white);position:relative;overflow:hidden}
+.card .ph{position:absolute;inset:0;transition:transform .8s var(--ease)}
+.card::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(transparent 45%,rgba(4,5,11,.75))}
+.card::after{content:"";position:absolute;inset:0;z-index:1;opacity:0;transition:opacity .6s;mix-blend-mode:screen;background:radial-gradient(70% 50% at 50% 0%,var(--glow-blue),transparent 70%),radial-gradient(60% 40% at 80% 100%,var(--glow-orange),transparent 70%)}
+.card:hover::after{opacity:1}
+.card:hover .ph{transform:scale(1.04)}
+.card .c-txt{position:absolute;left:40px;bottom:46px;z-index:2}
+.card small{font:800 12px var(--dot);letter-spacing:.12em;text-transform:uppercase;color:var(--muted-d)}
+.card h3{font:500 clamp(20px,1.8vw,28px)/1.1 var(--display);letter-spacing:-.02em;position:relative;padding-bottom:20px;margin-top:8px}
+.dash{position:relative}
+.statement{grid-column:1/5;text-align:center;font:200 clamp(26px,2.9vw,46px)/1.15 var(--display);letter-spacing:-.025em;padding:60px var(--pad) 90px}
+.arrows{display:flex;gap:14px;position:absolute;right:calc(var(--rail) + 24px);bottom:90px}
+.arrows button{width:58px;height:58px;border-radius:50%;background:var(--btn);color:var(--btn-fg);font-size:20px;box-shadow:0 2px 12px rgba(0,0,0,.08);transition:color .3s,background .3s}
+.arrows button:hover{background:var(--fg);color:var(--bg)}
+
+/* ================= ABOUT ================= */
+.about{position:relative;min-height:100vh;background:linear-gradient(var(--night) 0 48%,var(--deep) 48%);color:var(--white);overflow:hidden}
+.about .glow{background:radial-gradient(30% 40% at 40% 30%,var(--glow-blue),transparent 70%),radial-gradient(25% 30% at 70% 85%,var(--glow-orange),transparent 70%)}
+.about .top-meta{grid-column:1/6;display:flex;justify-content:space-between;padding:calc(var(--head) + 28px) 20px 0 var(--pad);color:var(--muted-d);position:relative}
+.about-h{position:relative;z-index:1;grid-column:1/6;display:grid;grid-template-columns:subgrid;margin-top:12vh;font:200 clamp(52px,7.4vw,132px)/1.1 var(--display);letter-spacing:-.03em}
+.about-h > span:first-child{grid-column:1/2;text-align:right;padding-right:7vw}
+.about-h > span:last-child{grid-column:2/-1;font-weight:500}
+.portrait-wrap{position:absolute;z-index:2;left:40.45%;transform:translateX(-62%);bottom:0;width:clamp(220px,22vw,380px);height:72%}
+.portrait-wrap::before{content:"";position:absolute;inset:-18px -18px 0;border-radius:220px 220px 0 0;border:1px solid var(--hair-d);border-bottom:0}
+.portrait-wrap::after{content:"";position:absolute;left:10%;right:10%;top:-30px;height:2px;background:var(--spectrum);filter:blur(1px);box-shadow:0 0 40px 6px var(--glow-blue)}
+.portrait{position:absolute;inset:0;border-radius:200px 200px 0 0}
+.portrait::after{top:auto;bottom:24px;left:50%;transform:translateX(-50%);text-align:center}
+.note{position:absolute;z-index:3;left:65.45%;top:58%;width:clamp(200px,15vw,260px);background:rgba(255,255,255,.05);backdrop-filter:blur(12px);border:1px solid var(--hair-d);padding:40px 24px 26px;font:700 13px/1.6 var(--dot);text-transform:uppercase;letter-spacing:.05em}
+.annot{position:absolute;z-index:3;left:calc(var(--pad) + 6vw);bottom:10%;width:180px;font:700 13px/1.6 var(--dot);text-transform:uppercase;letter-spacing:.04em;color:var(--muted-d)}
+.annot u{text-underline-offset:3px;color:var(--white)}
+.annot svg{position:absolute;left:120px;top:-120px;width:clamp(120px,14vw,240px);height:160px;overflow:visible}
+.annot path{fill:none;stroke:url(#spec);stroke-width:1.4;stroke-dasharray:400;stroke-dashoffset:400;transition:stroke-dashoffset 1.6s var(--ease) .3s}
+.about.in .annot path{stroke-dashoffset:0}
+
+/* ================= CAPABILITIES ================= */
+.caps{padding:100px 0 110px;border-bottom:1px solid var(--hair)}
+.caps .intro{grid-column:1/2}
+.caps .intro .eyebrow{color:var(--muted)}
+.caps .intro h2{font:300 clamp(34px,3.8vw,60px)/1.05 var(--display);letter-spacing:-.025em;margin-top:22px;max-width:12ch}
+.cap{padding-top:66px}
+.cap:nth-of-type(3){grid-column:4/6}
+.cap h3{font:500 clamp(17px,1.5vw,22px)/1.25 var(--display)}
+.cap p{margin-top:12px;font:400 clamp(15px,1.2vw,18px)/1.5 var(--body);color:var(--muted)}
+.cap .num{display:inline-block;font:900 22px var(--dot);margin-bottom:16px}
+.cap:hover h3{background:var(--spectrum);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* ================= EDUCATION ================= */
+.glance{position:relative;min-height:92vh;color:var(--white);display:flex;align-items:center;overflow:hidden;background:var(--deep)}
+.glance .ph{position:absolute;inset:0}
+.glance .ph::after{left:auto;right:calc(var(--rail) + 24px);top:auto;bottom:20px}
+.glance .shade{position:absolute;inset:0;background:rgba(10,16,51,.72)}
+.glance .glow{background:radial-gradient(40% 50% at 20% 10%,var(--glow-blue),transparent 70%),radial-gradient(30% 40% at 80% 95%,var(--glow-orange),transparent 70%)}
+.glance .grid{width:100%}
+.glance h2{grid-column:2/4;font:500 clamp(40px,4.6vw,76px)/1.02 var(--display);letter-spacing:-.035em;border-bottom:1px solid var(--hair-d);padding-bottom:10px}
+.glance .sub{grid-column:2/5;font:200 clamp(24px,2.6vw,42px)/1.2 var(--display);margin-top:22px}
+.glance .years{grid-column:2/6;margin-top:20px;color:var(--muted-d);font-size:15px}
+.glance .link{grid-column:2/3;justify-self:start;margin-top:34px;font:500 20px var(--display);padding-bottom:10px;position:relative}
+.glance .link::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--spectrum)}
+
+/* ================= PROCESS ================= */
+.process{padding:110px 0 0}
+.process .p-head{padding-bottom:60px}
+.process .p-head h2{grid-column:1/2;font:400 clamp(36px,4.2vw,68px)/1 var(--display);letter-spacing:-.03em;margin-top:20px}
+.process .p-head h2 .eyebrow{display:block;color:var(--muted);margin-bottom:20px}
+.process .p-head p{grid-column:2/5;align-self:end;font:400 clamp(17px,1.5vw,22px)/1.45 var(--body);color:var(--muted)}
+.step{border-top:1px solid var(--hair);padding:34px 0 40px;transition:background .4s}
+.step:last-child{border-bottom:1px solid var(--hair)}
+.step:hover{background:var(--fog)}
+.step h3{grid-column:1/2;font:300 clamp(28px,3vw,46px)/1.1 var(--display);letter-spacing:-.02em;display:flex;gap:22px;align-items:baseline}
+.step h3 i{font:900 18px var(--dot);font-style:normal;color:var(--muted)}
+.step:hover h3 i{background:var(--spectrum);-webkit-background-clip:text;background-clip:text;color:transparent}
+.step p{grid-column:2/3;font:400 16px/1.55 var(--body);color:var(--muted)}
+.step ul{grid-column:3/5;list-style:none;font:700 14px/2 var(--dot);text-transform:uppercase;letter-spacing:.06em;color:var(--fg)}
+.step ul li::before{content:"→ ";color:var(--muted)}
+
+/* ================= FOOTER ================= */
+.foot{background:var(--black);color:var(--white);padding:110px 0 0;overflow:hidden}
+.foot .glow{inset:auto -10% -40% -10%;height:90%;background:radial-gradient(40% 60% at 30% 100%,var(--glow-blue),transparent 70%),radial-gradient(35% 55% at 72% 100%,var(--glow-orange),transparent 70%)}
+.foot > *:not(.glow){position:relative}
+.foot h2{grid-column:1/2;font:200 clamp(44px,5.4vw,92px)/1.02 var(--display);letter-spacing:-.03em}
+.foot .mail{grid-column:1/3;margin-top:36px;font:300 clamp(22px,2.4vw,38px) var(--display);justify-self:start;padding-bottom:6px}
+.foot .mail::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--spectrum)}
+.foot .col{padding-top:14px}
+.foot .col .eyebrow{color:var(--muted-d);margin-bottom:22px;display:block;font-size:12px}
+.foot .col a{display:block;font:500 16px/2.1 var(--body)}
+.foot .col a:hover{color:var(--s-orange)}
+.foot .col.last{grid-column:4/6}
+.foot .base{grid-column:1/6;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:110px;padding:24px 20px 30px var(--pad);border-top:1px solid var(--hair-d);font:700 12px var(--dot);letter-spacing:.1em;text-transform:uppercase;color:var(--muted-d)}
+.foot .base .indic{font:400 14px var(--display);letter-spacing:.02em;text-transform:none}
+
+/* reveal */
+[data-reveal]{opacity:0;transform:translateY(40px);transition:opacity 1s var(--ease),transform 1s var(--ease)}
+[data-reveal].in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  [data-reveal]{opacity:1;transform:none}
+  .greet b:first-child{opacity:1}
+}
+
+/* ================= RESPONSIVE (φ : 1) ================= */
+@media (max-width:900px){
+  :root{--cols:1.618fr 1fr;--head:60px;--rail:44px;--qlh:50px}
+  .grid-lines span:nth-child(n+3){display:none}
+  .grid > *, .about-h > span{grid-column:1/-1!important;grid-row:auto!important}
+  /* rail becomes two buttons inside the header */
+  .rail{bottom:auto;width:auto;height:var(--head);flex-direction:row;align-items:center;gap:6px;padding-right:10px}
+  .rail-slot{display:none}
+  .rbtn{width:40px;height:40px;border:0;border-radius:50%}
+  .rbtn .tip{display:none}
+  .site-head .cell{padding-right:110px}
+  .site-head.solid{background:var(--black)}
+  .ql{top:var(--head);display:grid;grid-template-columns:repeat(4,1fr)!important;padding:0 var(--pad)}
+  .ql a{grid-column:auto!important;padding-right:8px}
+  .ql .ic,.ql-label,.ql i{display:none}
+  .hero{padding-bottom:calc(var(--qlh) + 40px)}
+  .hero h1{font-size:clamp(52px,14vw,90px)}
+  .cell:not(.first){padding-left:var(--pad)}
+  .f-title{padding-top:calc(var(--head) + var(--qlh) + 20px)}
+  .f-img{min-height:60vh}
+  .track{padding-left:var(--pad)}
+  .card{flex-basis:72vw}
+  .work h2{padding-left:var(--pad)}
+  .arrows{position:static;padding:0 var(--pad) 40px}
+  .about .top-meta{padding-right:var(--pad)}
+  .about-h{margin-top:6vh}
+  .about-h > span:first-child{text-align:left;padding-left:var(--pad)}
+  .about-h > span:last-child{padding-left:var(--pad)}
+  .portrait-wrap{left:50%;transform:translateX(-50%);height:46%}
+  .note{left:auto;right:var(--pad);top:auto;bottom:6%;z-index:4}
+  .annot{display:none}
+  .glance h2,.glance .sub,.glance .years,.glance .link{margin-left:var(--pad)}
+  .step ul{padding-left:var(--pad);margin-top:14px}
+  .step p{margin-top:14px}
+  .menu ul{padding:0 var(--pad)}
+  .foot .base{padding-right:var(--pad)}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="spec" x1="0" x2="1" y1="1" y2="0"><stop offset="0" stop-color="#2440ff"/><stop offset=".5" stop-color="#8a5cf0"/><stop offset="1" stop-color="#ff7a2e"/></linearGradient>
+  <mask id="moonMask"><rect width="24" height="24" fill="#fff"/><circle class="mc" cx="30" cy="8" r="6.5" fill="#000"/></mask>
+</defs></svg>
+
+<div class="grid-lines" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+
+<!-- ================= RAIL · column 6 (reserved) ================= -->
+<aside class="rail" aria-label="Display controls">
+  <button class="rbtn" id="gridBtn" aria-pressed="false" aria-label="Show grid">
+    <svg class="gi" viewBox="0 0 22 22"><rect x="1" y="1" width="20" height="20"/>
+      <line x1="9.1" y1="1" x2="9.1" y2="21"/><line x1="14.1" y1="1" x2="14.1" y2="21"/><line x1="17.2" y1="1" x2="17.2" y2="21"/><line x1="19.1" y1="1" x2="19.1" y2="21"/></svg>
+    <span class="tip">φ Grid</span>
+  </button>
+  <button class="rbtn" id="darkBtn" aria-pressed="false" aria-label="Dark mode">
+    <svg class="mi" viewBox="0 0 24 24">
+      <g class="disc"><circle cx="12" cy="12" r="5.5" fill="currentColor" mask="url(#moonMask)"/></g>
+      <g class="rays" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 1.5v2.5M12 20v2.5M1.5 12H4M20 12h2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></g>
+    </svg>
+    <span class="tip">Dark mode</span>
+  </button>
+  <div class="rail-slot"><!-- RESERVED for future links / interactive slider / CTA --></div>
+</aside>
+
+<!-- ================= HEADER: wordmark + menu ================= -->
+<header class="site-head grid" id="head">
+  <div class="cell first">
+    <a class="brand" href="#top">samiksha sinha</a>
+    <button class="menu-btn" id="menuOpen" aria-label="Open menu"><span class="burger"></span>Menu</button>
+  </div>
+</header>
+
+<!-- ================= MENU ================= -->
+<nav class="menu grid" id="menu" aria-hidden="true">
+  <div class="glow"></div>
+  <button class="close" id="menuClose">Close ✕</button>
+  <p class="m-meta">Samiksha Sinha<br>Product Designer<br>Bengaluru / Vellore, IN</p>
+  <ul>
+    <li><a href="#work">Selected work</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="#cv">Education &amp; CV</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- ================= HERO ================= -->
+<section class="hero" id="top">
+  <div class="ph ph-dark hero-bg" data-label="Hero image / showreel · full-bleed 16:9 · replace with &lt;img&gt; or &lt;video&gt;"></div>
+  <div class="hero-shade"></div>
+  <div class="glow"></div>
+  <div class="grid hero-inner">
+    <p class="cell first eyebrow" data-reveal>Product Designer · M.Des VIT 2026–28</p>
+    <h1 class="cell first" data-reveal>
+      <span class="greet" aria-label="Namaste, in five languages">
+        <b lang="hi">नमस्ते.</b><b lang="kn">ನಮಸ್ಕಾರ.</b><b lang="ta">வணக்கம்.</b><b lang="bn">নমস্কার.</b><b lang="en">hey.</b>
+      </span>
+      <span class="l2">i’m samiksha</span>
+    </h1>
+    <p class="cell lede" data-reveal><strong>Designing for people, one interaction at a time.</strong> Empathy-focused, customer-experience obsessed, and fluent in the motion that makes interfaces feel human.</p>
+  </div>
+</section>
+
+<!-- ================= QUICK LINKS → NAVBAR (same element) ================= -->
+<nav class="ql grid" id="ql" aria-label="Sections">
+  <span class="ql-label eyebrow">Quick links</span>
+  <a href="#work"><svg class="ic" viewBox="0 0 36 36"><rect x="4" y="6" width="28" height="20"/><path d="M4 30h28M12 12h12M12 18h8"/></svg><b>Work</b><i>01</i></a>
+  <a href="#about"><svg class="ic" viewBox="0 0 36 36"><circle cx="18" cy="13" r="6"/><path d="M7 31c2-7 7-10 11-10s9 3 11 10"/></svg><b>About</b><i>02</i></a>
+  <a href="#process"><svg class="ic" viewBox="0 0 36 36"><circle cx="18" cy="18" r="13"/><path d="M18 5v26M5 18h26M9 9l18 18"/></svg><b>Process</b><i>03</i></a>
+  <a href="#cv"><svg class="ic" viewBox="0 0 36 36"><path d="M9 4h13l6 6v22H9z"/><path d="M14 16h10M14 21h10M14 26h6"/></svg><b>CV ↗</b><i>04</i></a>
+</nav>
+
+<!-- ================= FEATURED CASE STUDY ================= -->
+<section class="featured grid" id="work">
+  <div class="cell first f-title" data-reveal>
+    <p class="eyebrow">Featured case study · 01</p>
+    <h2>Project Title Placeholder</h2>
+  </div>
+  <p class="cell first f-desc" data-reveal>One or two lines on the problem, who it was for and the outcome. Replace with your strongest case study summary.</p>
+  <div class="f-meta" data-reveal>
+    <dl>
+      <dt>Role</dt><dd>Product Designer</dd>
+      <dt>Year</dt><dd>20XX</dd>
+      <dt>Focus</dt><dd>UX research · UI · Motion</dd>
+    </dl>
+    <a class="cta" href="#">View case study <span>↗</span></a>
+  </div>
+  <div class="ph f-img" data-label="Featured project image · portrait crop ~ 3:4"></div>
+</section>
+
+<!-- ================= SELECTED WORK ================= -->
+<section class="work grid">
+  <h2 class="cell" data-reveal>Selected work across research, product &amp; motion</h2>
+  <div class="track" id="track">
+    <a class="card" href="#"><div class="ph ph-dark" data-label="Project 01 cover"></div><div class="c-txt"><small>UX Research</small><h3 class="dash">Project One</h3></div></a>
+    <a class="card" href="#"><div class="ph ph-dark" data-label="Project 02 cover"></div><div class="c-txt"><small>Product Design</small><h3 class="dash">Project Two</h3></div></a>
+    <a class="card" href="#"><div class="ph ph-dark" data-label="Project 03 cover"></div><div class="c-txt"><small>Motion / Interaction</small><h3 class="dash">Project Three</h3></div></a>
+    <a class="card" href="#"><div class="ph ph-dark" data-label="Project 04 cover"></div><div class="c-txt"><small>Service Design</small><h3 class="dash">Project Four</h3></div></a>
+    <a class="card" href="#"><div class="ph ph-dark" data-label="Project 05 cover"></div><div class="c-txt"><small>CX Strategy</small><h3 class="dash">Project Five</h3></div></a>
+    <a class="card" href="#"><div class="ph ph-dark" data-label="Project 06 cover"></div><div class="c-txt"><small>Prototyping</small><h3 class="dash">Project Six</h3></div></a>
+  </div>
+  <p class="statement" data-reveal>Explore projects where <span class="grad">listening to people</span> shaped every pixel, flow and frame of motion.</p>
+  <div class="arrows"><button id="prev" aria-label="Previous">←</button><button id="next" aria-label="Next">→</button></div>
+</section>
+
+<!-- ================= ABOUT ================= -->
+<section class="about grid" id="about">
+  <div class="glow"></div>
+  <div class="top-meta eyebrow"><span>02 · About</span><span>Samiksha Sinha</span></div>
+  <h2 class="about-h"><span>about.</span><span>me, briefly</span></h2>
+  <div class="portrait-wrap"><div class="ph ph-dark portrait" data-label="Portrait cutout · transparent PNG"></div></div>
+  <p class="note">Product designer, empathy first, customer-experience obsessed. Placeholder for a short personal line about you.</p>
+  <p class="annot">I also make <u>interactive motion</u> &amp; I’m still exploring it.
+    <svg viewBox="0 0 200 160"><path d="M0 150 C 80 150, 120 110, 200 10"/></svg>
+  </p>
+</section>
+
+<!-- ================= CAPABILITIES ================= -->
+<section class="caps grid">
+  <div class="cell first intro" data-reveal><p class="eyebrow">What I bring</p><h2>Three lenses I design through</h2></div>
+  <a class="cell cap" href="#" data-reveal><span class="num grad">01</span><h3>Empathy-focused design ↗</h3><p>Research that starts with people: interviews, journeys and the real context of use.</p></a>
+  <a class="cell cap" href="#" data-reveal><span class="num grad">02</span><h3>Customer-experience obsessed ↗</h3><p>Every touchpoint mapped, measured and refined.</p></a>
+  <a class="cell cap" href="#" data-reveal><span class="num grad">03</span><h3>Interactive motion ↗</h3><p>Motion that explains, guides and delights.</p></a>
+</section>
+
+<!-- ================= EDUCATION ================= -->
+<section class="glance" id="cv">
+  <div class="ph ph-dark" data-label="Campus / studio image · full-bleed"></div>
+  <div class="shade"></div>
+  <div class="glow"></div>
+  <div class="grid">
+    <h2 data-reveal>Masters in Design</h2>
+    <p class="sub" data-reveal>Vellore Institute of Technology</p>
+    <p class="years eyebrow" data-reveal>2026 — 2028 · Product Design</p>
+    <a class="link" href="#" data-reveal>Download CV</a>
+  </div>
+</section>
+
+<!-- ================= PROCESS ================= -->
+<section class="process" id="process">
+  <div class="grid p-head">
+    <h2 class="cell first" data-reveal><span class="eyebrow">How I work</span>Process</h2>
+    <p class="cell" data-reveal>Placeholder: a one-line description of your design approach.</p>
+  </div>
+  <div class="grid step"><h3 class="cell first"><i>01</i>Empathise</h3><p class="cell">Placeholder: how you understand users and their context.</p><ul class="cell"><li>Interviews</li><li>Contextual inquiry</li></ul></div>
+  <div class="grid step"><h3 class="cell first"><i>02</i>Define</h3><p class="cell">Placeholder: how you frame the right problem.</p><ul class="cell"><li>Journey maps</li><li>Problem statements</li></ul></div>
+  <div class="grid step"><h3 class="cell first"><i>03</i>Design</h3><p class="cell">Placeholder: ideation, flows and interface design.</p><ul class="cell"><li>Wireframes</li><li>UI systems</li></ul></div>
+  <div class="grid step"><h3 class="cell first"><i>04</i>Animate &amp; test</h3><p class="cell">Placeholder: motion prototypes and usability testing.</p><ul class="cell"><li>Motion prototypes</li><li>Usability tests</li></ul></div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer class="foot grid" id="contact">
+  <div class="glow"></div>
+  <h2 class="cell first" data-reveal>Let’s design something human.</h2>
+  <div class="col" data-reveal><span class="eyebrow">Elsewhere</span><a href="#">LinkedIn ↗</a><a href="#">Behance ↗</a><a href="#">Dribbble ↗</a></div>
+  <div class="col" data-reveal><span class="eyebrow">Pages</span><a href="#work">Work</a><a href="#about">About</a><a href="#process">Process</a></div>
+  <div class="col last" data-reveal><span class="eyebrow">Top</span><a href="#top">↑</a></div>
+  <a class="cell first mail" href="mailto:your.email@example.com">your.email@example.com</a>
+  <div class="base"><span>© 2026 Samiksha Sinha</span><span class="indic" lang="hi">धन्यवाद · Thank you</span><span>φ grid · 89 · 55 · 34 · 21 · 13 · 8</span></div>
+</footer>
+
+<script>
+const $=s=>document.querySelector(s), root=document.documentElement, body=document.body;
+
+/* rail width = exact width of the 6th golden column; navbar height follows it */
+const lastCol=$('.grid-lines span:last-child');
+const fit=()=>{const w=lastCol.getBoundingClientRect().width; w>0?root.style.setProperty('--rail',w+'px'):root.style.removeProperty('--rail')};
+fit(); addEventListener('resize',fit);
+
+/* menu */
+const menu=$('#menu');
+const setMenu=o=>{menu.classList.toggle('open',o);menu.setAttribute('aria-hidden',!o)};
+$('#menuOpen').onclick=()=>setMenu(true);
+$('#menuClose').onclick=()=>setMenu(false);
+menu.querySelectorAll('a').forEach(a=>a.onclick=()=>setMenu(false));
+addEventListener('keydown',e=>{if(e.key==='Escape')setMenu(false)});
+
+/* carousel */
+const track=$('#track');
+const step=d=>track.scrollBy({left:d*track.querySelector('.card').offsetWidth,behavior:'smooth'});
+$('#prev').onclick=()=>step(-1); $('#next').onclick=()=>step(1);
+
+/* reveal */
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.15});
+document.querySelectorAll('[data-reveal], .about').forEach(el=>io.observe(el));
+
+/* quick links dock into navbar + scroll progress */
+const ql=$('#ql'), head=$('#head');
+const onScroll=()=>{
+  const docked=ql.getBoundingClientRect().top<=(parseFloat(getComputedStyle(ql).top)||0)+1;
+  ql.classList.toggle('docked',docked); head.classList.toggle('solid',docked);
+  ql.style.setProperty('--p',root.scrollTop/((root.scrollHeight-root.clientHeight)||1));
+};
+addEventListener('scroll',onScroll,{passive:true}); onScroll();
+
+/* active section underline */
+const links=[...ql.querySelectorAll('a')];
+const so=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)links.forEach(l=>l.classList.toggle('on',l.hash==='#'+e.target.id))}),{rootMargin:'-45% 0px -50% 0px'});
+['work','about','process','cv'].forEach(id=>so.observe(document.getElementById(id)));
+
+/* rail buttons */
+$('#gridBtn').onclick=e=>e.currentTarget.setAttribute('aria-pressed',body.classList.toggle('show-grid'));
+const setDark=v=>{body.classList.toggle('dark',v);$('#darkBtn').setAttribute('aria-pressed',v)};
+setDark(matchMedia('(prefers-color-scheme: dark)').matches);
+$('#darkBtn').onclick=()=>setDark(!body.classList.contains('dark'));
+</script>
+</body>
+</html>
